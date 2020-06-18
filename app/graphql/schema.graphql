@@ -1,0 +1,26 @@
+enum Companies {
+  Safaricom
+  Absa
+}
+
+type Company {
+  name: Companies!
+}
+
+type HistoricalData {
+  Date: String!
+  Price: Float!
+  OpenPrice: Float!
+  HighestPrice: Float!
+  LowestPrice: Float!
+  Volume: String!
+  PercentageChange: String!
+  company: Company!
+}
+
+type Query {
+  allCompanies: [Company]!
+  allHistoriacalData: [HistoricalData]!
+  companyHistoricalData(company: Companies): [HistoricalData]!
+  hello: String!
+}
