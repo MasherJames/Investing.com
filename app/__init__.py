@@ -5,6 +5,7 @@ from ariadne import (graphql_sync, load_schema_from_path,
                      QueryType, make_executable_schema)
 from ariadne.constants import PLAYGROUND_HTML
 
+from app.db.database import init_db, db_session
 from app.graphql.resolvers import resolve_hello
 from .config import app_config
 
@@ -24,6 +25,9 @@ def create_app():
     app.config.from_object(app_config[os.getenv("APP_SETTINGS")])
     app.config.from_pyfile('config.py')
 
+    # Initialise the database and make it ready for use after the app starts
+    init_db()
+
     @app.route("/graphql", methods=["GET"])
     def graphql_playground():
         ''' On GET request serve GraphQL Playground '''
@@ -39,5 +43,10 @@ def create_app():
 
         status_code = 200 if success else 400
         return jsonify(result), status_code
+
+    @app.teardown_appcontext
+    def shutdown_session(exception=None):
+        ''' remove database sessions at the end of the request or when the application shuts down '''
+        db_session.remove()
 
     return app
