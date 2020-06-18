@@ -14,6 +14,7 @@ pylint = "*"
 python-dotenv = "*"
 psycopg2 = "*"
 sqlalchemy = "*"
+lxml = "*"
 
 [requires]
 python_version = "3.7"

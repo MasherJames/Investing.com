@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, relationship
 from .database import Base
 
 
@@ -6,6 +6,7 @@ class Company(Base):
     __tablename__ = "companies"
     id = Column(Integer, primary_key=True)
     name = Column(String(50), unique=True, nullable=False)
+    historicaldata = relationship("HistoricalData", backref="company")
 
     def __init__(self, name=None):
         ''' Company constructor '''
@@ -26,6 +27,7 @@ class HistoricalData(Base):
     lowest_price = Column(Float, nullable=False)
     volume = Column(String(50), nullable=False)
     percentage_change = Column(String(50), nullable=False)
+    company_id = Column(Integer, ForeignKey('companies.id'))
 
     def __init__(self, date=None,
                  price=None,
