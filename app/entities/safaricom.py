@@ -1,3 +1,5 @@
+from ..utils.scrap import ScrapParsePersist
+
 payload = {
     "curr_id": "941227",
     "smlID": "1508998",
@@ -17,3 +19,12 @@ headers = {
     "Referer": "https://www.investing.com/equities/safaricom-historical-data",
     "Connection": "keep-alive"
 }
+
+
+def triggerScrapParsePersist():
+    source = ScrapParsePersist().scrap(payload, headers)
+    print(source)
+
+
+if __name__ == "__main__":
+    triggerScrapParsePersist()

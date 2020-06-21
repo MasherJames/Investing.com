@@ -18,6 +18,8 @@ query.set_field("hello", resolve_hello)
 
 schema = make_executable_schema(type_defs, query)
 
+name = "fuck"
+
 
 def create_app():
     # Flask instance which is the WSGI application
@@ -26,7 +28,8 @@ def create_app():
     app.config.from_pyfile('config.py')
 
     # Initialise the database and make it ready for use after the app starts
-    init_db()
+    with app.app_context():
+        init_db()
 
     @app.route("/graphql", methods=["GET"])
     def graphql_playground():
