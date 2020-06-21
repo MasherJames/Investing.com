@@ -1,4 +1,5 @@
 # This file handles Scraping of the data, storing it to the database and creating a csv file also for the same
+import pathlib
 import requests
 import csv
 from requests.exceptions import HTTPError
@@ -25,28 +26,35 @@ class ScrapParsePersist:
     def parse_data(self, source):
         ''' pull data out of HTML '''
         soup = BeautifulSoup(source, 'lxml')
-        # Todo
-        print(soup)
+        parsed_data = []
+        # get table body only
+        table_body_data = soup.find('tbody')
+        for row in table_body_data.find_all('tr'):
+            table_data = row.find_all('td')
+            table_row_data = {
+                "date": table_data[0].text, "price": table_data[1].text,
+                "open_price": table_data[2].text, "highest_price": table_data[3].text,
+                "lowest_price": table_data[4].text, "volume": table_data[5].text,
+                "percentage_change": table_data[6].text,
+            }
+            parsed_data.append(table_row_data)
+        return parsed_data
 
     def store_in_csv(self, data, file_name):
         ''' Store scrapped data to a csv file'''
 
-        with open(f'../resource/{file_name}', 'w') as csv_file:
-            fieldnames = ['Date', 'Price', 'Open Price', 'Highest Price',
-                          'Lowest Price', 'Volume', 'Percentage Change']
+        csv_folder = pathlib.Path.cwd() / 'app' / 'resource'
+
+        with open(f'{csv_folder}/{file_name}.csv', 'w') as csv_file:
+            fieldnames = ['date', 'price', 'open_price', 'highest_price',
+                          'lowest_price', 'volume', 'percentage_change']
             csv_writer = csv.DictWriter(
                 csv_file,  fieldnames=fieldnames, delimiter=',')
 
             csv_writer.writeheader()
 
             for single_day_data in data:
-                csv_writer.writerow(
-                    [single_day_data['date'], single_day_data['price'],
-                     single_day_data['open_price'],
-                     single_day_data['highest_price'],
-                     single_day_data['lowest_price'],
-                     single_day_data['volume'],
-                     single_day_data['percentage_changes'], ])
+                csv_writer.writerow(single_day_data)
 
     def store_in_db(self, data):
         ''' store the scrapped data to the database '''

@@ -1,4 +1,5 @@
-from ..utils.scrap import ScrapParsePersist
+from app.utils.scrap import ScrapParsePersist
+
 
 payload = {
     "curr_id": "941227",
@@ -22,8 +23,12 @@ headers = {
 
 
 def triggerScrapParsePersist():
+    # Scrap
     source = ScrapParsePersist().scrap(payload, headers)
-    print(source)
+    # parse
+    parsed_data = ScrapParsePersist().parse_data(source)
+    # store in csv
+    ScrapParsePersist().store_in_csv(parsed_data, "safaricom")
 
 
 if __name__ == "__main__":
