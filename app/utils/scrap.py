@@ -4,6 +4,10 @@ import requests
 import csv
 from requests.exceptions import HTTPError
 from bs4 import BeautifulSoup
+from sqlalchemy.exc import SQLAlchemyError
+from app.db.database import db_session
+from app.db.models import Company, HistoricalData
+
 url = "https://www.investing.com/instruments/HistoricalDataAjax"
 
 
@@ -56,7 +60,49 @@ class ScrapParsePersist:
             for single_day_data in data:
                 csv_writer.writerow(single_day_data)
 
-    def store_in_db(self, data):
+    def add_company(self, company_name):
+        ''' Create a company if it does not exist '''
+        session = db_session()
+        try:
+            company = Company.query.filter(
+                Company.name == company_name).first()
+            if company is None:
+                company = Company(company_name)
+                session.add(company)
+                session.commit()
+        except SQLAlchemyError as err:
+            # rollback the transaction if something fails
+            print(err)
+            session.rollback()
+            raise
+        finally:
+            # close the Session and reset any existing SessionTransaction state
+            session.close()
+
+    def store_data_in_db(self, data, company_name):
         ''' store the scrapped data to the database '''
-        (date, price, open_price, highest_price,
-         lowest_price, volume, percentage_change) = data
+        session = db_session()
+
+        try:
+            company = session.query(Company).first()
+            company_id = company.id
+
+            for row in data:
+                historical_data = HistoricalData(
+                    date=row['date'], price=row['price'],
+                    open_price=row['open_price'], highest_price=row['highest_price'],
+                    lowest_price=row['lowest_price'], volume=row['volume'],
+                    percentage_change=row['percentage_change'],
+                    company_id=company_id
+                )
+                session.add(historical_data)
+            # commit pending changes above
+                session.commit()
+        except SQLAlchemyError as err:
+            # rollback the transaction if something fails
+            print(err)
+            session.rollback()
+            raise
+        finally:
+            # close the Session and reset any existing SessionTransaction state
+            session.close()

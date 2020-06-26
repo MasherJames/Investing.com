@@ -29,6 +29,10 @@ def triggerScrapParsePersist():
     parsed_data = ScrapParsePersist().parse_data(source)
     # store in csv
     ScrapParsePersist().store_in_csv(parsed_data, "safaricom")
+    # add company to add its data
+    ScrapParsePersist().add_company("safaricom")
+    # store historical data to db
+    ScrapParsePersist().store_data_in_db(parsed_data, "safaricom")
 
 
 if __name__ == "__main__":

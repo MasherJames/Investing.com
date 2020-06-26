@@ -5,9 +5,10 @@ from .database import Base
 
 class Company(Base):
     __tablename__ = "companies"
+    __bind_key__ = "companies"
     id = Column(Integer, primary_key=True)
     name = Column(String(50), unique=True, nullable=False)
-    historicaldata = relationship("HistoricalData", backref="company")
+    historicaldata = relationship("HistoricalData", backref="companies")
 
     def __init__(self, name=None):
         ''' Company constructor '''
@@ -36,7 +37,7 @@ class HistoricalData(Base):
                  highest_price=None,
                  lowest_price=None,
                  volume=None,
-                 percentage_change=None,):
+                 percentage_change=None, company_id=None):
         ''' HistoricalData constructor '''
         self.date = date
         self.price = price
@@ -45,6 +46,7 @@ class HistoricalData(Base):
         self.lowest_price = lowest_price
         self.volume = volume
         self.percentage_change = percentage_change
+        self.company_id = company_id
 
     def __repr__(self):
         ''' Object representation on historical data '''
