@@ -6,7 +6,9 @@ from ariadne import (graphql_sync, load_schema_from_path,
 from ariadne.constants import PLAYGROUND_HTML
 
 from app.db.database import init_db, db_session
-from app.graphql.resolvers import resolve_hello
+from app.graphql.resolvers import *
+from app.graphql.directives import FormatDateDirective
+from app.graphql.enums import company_name
 from .config import app_config
 
 # load schema
@@ -14,11 +16,12 @@ type_defs = load_schema_from_path("app/graphql/schema.graphql")
 
 query = QueryType()
 
-query.set_field("hello", resolve_hello)
+query.set_field("allCompanies", resolve_all_companies)
+query.set_field("allHistoriacalData", resolve_all_historical_data)
+query.set_field("companyHistoricalData", resolve_company_historical_data)
 
-schema = make_executable_schema(type_defs, query)
-
-name = "fuck"
+schema = make_executable_schema(type_defs, [query, company_name], directives={
+                                "formatDate": FormatDateDirective})
 
 
 def create_app():

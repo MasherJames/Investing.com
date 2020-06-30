@@ -1,26 +1,41 @@
-enum Companies {
+directive @formatDate(format: String) on FIELD_DEFINITION
+
+enum CompanyName {
   Safaricom
   Absa
 }
 
 type Company {
-  name: Companies!
+  id: ID!
+  name: CompanyName!
+}
+
+type ComapnyPayload {
+  status: Boolean!
+  message: String!
+  companies: [Company]!
 }
 
 type HistoricalData {
-  Date: String!
-  Price: Float!
-  OpenPrice: Float!
-  HighestPrice: Float!
-  LowestPrice: Float!
-  Volume: String!
-  PercentageChange: String!
+  id: ID!
+  date: String! @formatDate(format: "%B %d, %Y")
+  price: Float!
+  open_price: Float!
+  highest_price: Float!
+  lowest_price: Float!
+  volume: String!
+  percentage_change: String!
   company: Company!
 }
 
+type HistoricalDataPayload {
+  status: Boolean!
+  message: String!
+  historical_data: [HistoricalData]!
+}
+
 type Query {
-  allCompanies: [Company]!
-  allHistoriacalData: [HistoricalData]!
-  companyHistoricalData(company: Companies): [HistoricalData]!
-  hello: String!
+  allCompanies: ComapnyPayload!
+  allHistoriacalData: HistoricalDataPayload!
+  companyHistoricalData(company: CompanyName): HistoricalDataPayload!
 }
