@@ -46,8 +46,6 @@ celery.conf.beat_schedule = {
     # Executes every Monday midnight at 0000hrs
     'scarp-persist-every-monday': {
         'task': 'tasks.triggerScrapParsePersist',
-        'schedule': crontab(minute='*/2')
+        'schedule': crontab(day_of_week=1, hour=0)
     }
 }
-
-# day_of_week = 1, hour = 0
