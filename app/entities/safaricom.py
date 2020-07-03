@@ -1,12 +1,15 @@
-from app.utils.scrap import ScrapParsePersist
+from celery.schedules import crontab
 
+from app.celery import celery
+from app.utils.scrap import ScrapParsePersist
+from app.utils.date import start_date, end_date
 
 payload = {
     "curr_id": "941227",
     "smlID": "1508998",
     "header": "SCOM Historical Data",
-    "st_date": "05/01/2020",
-    "end_date": "06/01/2020",
+    "st_date": start_date,
+    "end_date": end_date,
     "interval_sec": "Daily",
     "sort_col": "date",
     "sort_ord": "DESC",
@@ -22,7 +25,9 @@ headers = {
 }
 
 
+@celery.task
 def triggerScrapParsePersist():
+
     # Scrap
     source = ScrapParsePersist().scrap(payload, headers)
     # parse
@@ -35,5 +40,14 @@ def triggerScrapParsePersist():
     ScrapParsePersist().store_data_in_db(parsed_data, "safaricom")
 
 
-if __name__ == "__main__":
-    triggerScrapParsePersist()
+# add triggerScrapParsePersist task to the beat schedule
+
+celery.conf.beat_schedule = {
+    # Executes every Monday midnight at 0000hrs
+    'scarp-persist-every-monday': {
+        'task': 'tasks.triggerScrapParsePersist',
+        'schedule': crontab(minute='*/2')
+    }
+}
+
+# day_of_week = 1, hour = 0
