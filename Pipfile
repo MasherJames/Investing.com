@@ -16,6 +16,8 @@ psycopg2 = "*"
 sqlalchemy = "*"
 lxml = "*"
 graphql-core = ">=3"
+celery = "*"
+redis = "*"
 
 [requires]
 python_version = "3.7"
