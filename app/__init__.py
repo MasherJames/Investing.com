@@ -22,13 +22,12 @@ query.set_field("companyHistoricalData", resolve_company_historical_data)
 
 schema = make_executable_schema(type_defs, [query, company_name], directives={
                                 "formatDate": FormatDateDirective})
-# app_config[os.getenv("APP_SETTINGS")]
 
 
 def create_app():
     # Flask instance which is the WSGI application
     app = Flask(__name__)
-    app.config.from_object(app_config["production"])
+    app.config.from_object(app_config[os.getenv("APP_SETTINGS")])
     app.config.from_pyfile('config.py')
 
     # Initialise the database and make it ready for use after the app starts
