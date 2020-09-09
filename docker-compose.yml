@@ -22,5 +22,26 @@ services:
     ports:
       - "5432:5432"
 
+  redis:
+    image: "redis:alpine"
+
+  celery_worker:
+    build: .
+    command: celery -A app.celery.worker:celery worker --loglevel=info
+    volumes:
+      - ./:/usr/src/app
+    restart: on-failure
+    depends_on:
+      - redis
+      - db
+  celery_beat:
+    build: .
+    command: celery -A app.celery.worker:celery beat --loglevel=info
+    volumes:
+      - ./:/usr/src/app
+    restart: on-failure
+    depends_on:
+      - redis
+      - db
 volumes:
   postgres_data:
