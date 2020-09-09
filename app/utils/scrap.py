@@ -1,4 +1,5 @@
 # This file handles Scraping of the data, storing it to the database and creating a csv file also for the same
+import os
 import pathlib
 import requests
 import csv
@@ -47,15 +48,22 @@ class ScrapParsePersist:
     def store_in_csv(self, data, file_name):
         ''' Store scrapped data to a csv file'''
 
-        csv_folder = pathlib.Path.cwd() / 'app' / 'resource'
+        csv_folder_path = pathlib.Path.cwd() / 'app' / 'resource'
+        csv_file_path = f'{csv_folder_path}/{file_name}.csv'
 
-        with open(f'{csv_folder}/{file_name}.csv', 'w') as csv_file:
+        fileEmpty = True
+
+        if os.path.isfile(csv_file_path):
+            fileEmpty = os.stat(csv_file_path).st_size == 0
+
+        with open(csv_file_path, 'a') as csv_file:
             fieldnames = ['date', 'price', 'open_price', 'highest_price',
                           'lowest_price', 'volume', 'percentage_change']
             csv_writer = csv.DictWriter(
                 csv_file,  fieldnames=fieldnames, delimiter=',')
 
-            csv_writer.writeheader()
+            if fileEmpty:
+                csv_writer.writeheader()
 
             for single_day_data in data:
                 csv_writer.writerow(single_day_data)
