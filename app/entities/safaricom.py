@@ -1,15 +1,21 @@
-from celery.schedules import crontab
-
-from app.celery import celery
+import time
+import requests
+from datetime import datetime, date, timedelta
+from requests.exceptions import HTTPError
+from app import create_app
+from app.celery import make_celery
 from app.utils.scrap import ScrapParsePersist
-from app.utils.date import start_date, end_date
+
+
+today = date.today()
+sevenDaysAgo = today - timedelta(days=7)
 
 payload = {
     "curr_id": "941227",
     "smlID": "1508998",
     "header": "SCOM Historical Data",
-    "st_date": start_date,
-    "end_date": end_date,
+    "st_date": sevenDaysAgo.strftime("%m/%d/%Y"),
+    "end_date": today.strftime("%m/%d/%Y"),
     "interval_sec": "Daily",
     "sort_col": "date",
     "sort_ord": "DESC",
@@ -25,6 +31,11 @@ headers = {
 }
 
 
+app = create_app()
+celery = make_celery(app)
+url = "https://www.investing.com/instruments/HistoricalDataAjax"
+
+
 @celery.task
 def triggerScrapParsePersist():
 
@@ -38,14 +49,3 @@ def triggerScrapParsePersist():
     ScrapParsePersist().add_company("safaricom")
     # store historical data to db
     ScrapParsePersist().store_data_in_db(parsed_data, "safaricom")
-
-
-# add triggerScrapParsePersist task to the beat schedule
-
-celery.conf.beat_schedule = {
-    # Executes every Monday midnight at 0000hrs
-    'scarp-persist-every-monday': {
-        'task': 'tasks.triggerScrapParsePersist',
-        'schedule': crontab(day_of_week=1, hour=0)
-    }
-}
