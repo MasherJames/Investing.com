@@ -11,7 +11,7 @@ from celery import Celery
 def make_celery(app):
     # create a celery instance with the message broker url
     celery = Celery(
-        app.import_name, backend=app.config['REDIS_URL'], broker=app.config["REDIS_URL"])
+        app.import_name, backend=app.config["REDIS_URL"], broker=app.config["REDIS_URL"])
 
     # subclass tasks and hook up the app context
     class ContextTask(celery.Task):
