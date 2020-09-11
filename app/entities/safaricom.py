@@ -1,4 +1,5 @@
 import time
+import os
 import requests
 from datetime import datetime, date, timedelta
 from requests.exceptions import HTTPError
@@ -43,8 +44,9 @@ def triggerScrapParsePersist():
     source = ScrapParsePersist().scrap(payload, headers)
     # parse
     parsed_data = ScrapParsePersist().parse_data(source)
-    # store in csv
-    ScrapParsePersist().store_in_csv(parsed_data, "safaricom")
+    # store in csv if in dev
+    if os.getenv("APP_SETTINGS") == "development":
+        ScrapParsePersist().store_in_csv(parsed_data, "safaricom")
     # add company to add its data
     ScrapParsePersist().add_company("safaricom")
     # store historical data to db
