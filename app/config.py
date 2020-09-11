@@ -5,13 +5,13 @@ class Config():
     """Parent configuration class."""
     DEBUG = False
     CSRF_ENABLED = True
+    DATABASE_URL = os.getenv('DATABASE_URL')
+    REDIS_URL = os.getenv('REDIS_URL')
 
 
 class DevelopmentConfig(Config):
     """Configurations for Development."""
     DEBUG = True
-    DATABASE_URL = os.getenv('DATABASE_URL')
-    REDIS_URL = os.getenv('REDIS_URL')
 
 
 class TestingConfig(Config):
