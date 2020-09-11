@@ -13,8 +13,4 @@ celery = make_celery(app)
 def setup_periodic_tasks(sender, **kwargs):
     # add entry to the beat scheduler
     sender.add_periodic_task(
-        crontab(), triggerScrapParsePersist)
-
-
-# sender.add_periodic_task(
-#     crontab(hour=0, minute=0, day_of_week=1), triggerScrapParsePersist)
+        crontab(hour=0, minute=0, day_of_week=1), triggerScrapParsePersist)
